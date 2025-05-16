@@ -8,12 +8,12 @@ export default function AdminPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const router = useRouter()
 
-  useEffect(() => {
+   useEffect(() => {
     const getUser = async () => {
       const { data: { user }, error } = await supabase.auth.getUser()
 
       if (user) {
-        setUserEmail(user.email)
+        setUserEmail(user.email ?? null)
       } else {
         router.push('/login') // 没登录就跳转回 login
       }

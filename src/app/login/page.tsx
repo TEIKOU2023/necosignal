@@ -8,15 +8,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const router = useRouter();
+  const allowedEmails = ["zhenghengteikou@gmail.com"]; // ← 替换成你自己的邮箱
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!allowedEmails.includes(email)) {
+      setMessage("This email is not authorized.");
+      return;
+    }
+
     setMessage("Sending magic link...");
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: "http://localhost:3000/admin", // 登录后跳转页面
+        emailRedirectTo: "http://localhost:3000/admin",
       },
     });
 
