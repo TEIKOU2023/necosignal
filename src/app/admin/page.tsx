@@ -1,31 +1,33 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
-  const [userEmail, setUserEmail] = useState<string | null>(null)
-  const router = useRouter()
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const router = useRouter();
 
-   useEffect(() => {
+  useEffect(() => {
     const getUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser()
-
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      // const error = null; // 去掉未使用警告
       if (user) {
-        setUserEmail(user.email ?? null)
+        setUserEmail(user.email ?? null);
       } else {
-        router.push('/login') // 没登录就跳转回 login
+        router.push("/login"); // 没登录就跳转回 login
       }
-    }
+    };
 
-    getUser()
-  }, [])
+    getUser();
+  }, [router]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-white dark:bg-black text-black dark:text-white">
@@ -40,5 +42,5 @@ export default function AdminPage() {
         Log Out
       </button>
     </main>
-  )
+  );
 }
