@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-//import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  // const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const router = useRouter();
   const allowedEmails = ["zhenghengteikou@gmail.com"]; // ← 替换成你自己的邮箱
 
   const handleLogin = async (e: React.FormEvent) => {
