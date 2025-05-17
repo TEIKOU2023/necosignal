@@ -8,7 +8,7 @@ type BlogPageProps = {
   };
 };
 
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const posts = getAllPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
