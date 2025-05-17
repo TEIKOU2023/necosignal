@@ -1,29 +1,29 @@
-import { getAllPosts } from "@/lib/blog";
-import { markdownToHtml } from "@/lib/markdownToHtml";
-import { notFound } from "next/navigation";
+import { getAllPosts } from '@/lib/blog'
+import { markdownToHtml } from '@/lib/markdownToHtml'
+import { notFound } from 'next/navigation'
 
-// ✅ 明确类型定义
-type Params = {
-  params: {
-    slug: string;
-  };
-};
+// 明确 dynamic 模式：强制不要 prerender（非常关键）
+export const dynamic = 'force-dynamic'
 
-// ✅ 显式标注 static params 类型
-export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  const posts = getAllPosts();
-  return posts.map((post) => ({ slug: post.slug }));
+// generateStaticParams 直接返回 slug 数组
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  const posts = getAllPosts()
+  return posts.map((post) => ({ slug: post.slug }))
 }
 
-// ✅ 避免类型混淆：直接 inline 类型，而不使用 BlogPageProps
-export default async function BlogDetailPage({ params }: Params) {
-  const { slug } = params;
-  const posts = getAllPosts();
-  const post = posts.find((p) => p.slug === slug);
+// 页面组件参数不使用 type 或 interface！直接解构 + inline
+export default async function BlogDetailPage({
+  params,
+}: {
+  params: { slug: string }
+}) {
+  const { slug } = params
+  const posts = getAllPosts()
+  const post = posts.find((p) => p.slug === slug)
 
-  if (!post) return notFound();
+  if (!post) return notFound()
 
-  const html = await markdownToHtml(post.content);
+  const html = await markdownToHtml(post.content)
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-10">
@@ -34,5 +34,5 @@ export default async function BlogDetailPage({ params }: Params) {
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </main>
-  );
+  )
 }
