@@ -2,18 +2,21 @@ import { getAllPosts } from "@/lib/blog";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import { notFound } from "next/navigation";
 
-type BlogPageProps = {
+// ✅ 明确类型定义
+type Params = {
   params: {
     slug: string;
   };
 };
 
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
+// ✅ 显式标注 static params 类型
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const posts = getAllPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-export default async function BlogDetailPage({ params }: BlogPageProps) {
+// ✅ 避免类型混淆：直接 inline 类型，而不使用 BlogPageProps
+export default async function BlogDetailPage({ params }: Params) {
   const { slug } = params;
   const posts = getAllPosts();
   const post = posts.find((p) => p.slug === slug);
