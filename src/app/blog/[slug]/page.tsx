@@ -2,17 +2,18 @@ import { getAllPosts } from "@/lib/blog";
 import { markdownToHtml } from "@/lib/markdownToHtml";
 import { notFound } from "next/navigation";
 
+type BlogPageProps = {
+  params: {
+    slug: string;
+  };
+};
+
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const posts = getAllPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-
-export default async function BlogDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function BlogDetailPage({ params }: BlogPageProps) {
   const { slug } = params;
   const posts = getAllPosts();
   const post = posts.find((p) => p.slug === slug);
