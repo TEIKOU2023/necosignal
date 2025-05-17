@@ -13,11 +13,7 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-export default async function BlogDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function BlogDetailPage({ params }: BlogPageProps) {
   const { slug } = params;
   const posts = getAllPosts();
   const post = posts.find((p) => p.slug === slug);
