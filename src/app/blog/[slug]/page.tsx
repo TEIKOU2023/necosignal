@@ -1,26 +1,30 @@
-import { getAllPosts } from '@/lib/blog'
-import { markdownToHtml } from '@/lib/markdownToHtml'
-import { notFound } from 'next/navigation'
+import { getAllPosts } from "@/lib/blog";
+import { markdownToHtml } from "@/lib/markdownToHtml";
+import { notFound } from "next/navigation";
 
 type BlogPageProps = {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
+};
+
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  const posts = getAllPosts();
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
-export async function generateStaticParams() {
-  const posts = getAllPosts()
-  return posts.map((post) => ({ slug: post.slug }))
-}
+export default async function BlogDetailPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = params;
+  const posts = getAllPosts();
+  const post = posts.find((p) => p.slug === slug);
 
-export default async function BlogDetailPage({ params }: BlogPageProps) {
-  const { slug } = params
-  const posts = getAllPosts()
-  const post = posts.find((p) => p.slug === slug)
+  if (!post) return notFound();
 
-  if (!post) return notFound()
-
-  const html = await markdownToHtml(post.content)
+  const html = await markdownToHtml(post.content);
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-10">
@@ -31,5 +35,5 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </main>
-  )
+  );
 }
