@@ -1,5 +1,7 @@
 "use client";
 
+import slugify from "slugify";
+import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -8,20 +10,30 @@ export default function WritePage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const slug = title.toLowerCase().replace(/\s+/g, "-");
-    console.log("📝 New post:", {
-      slug,
-      title,
-      content,
-      date: new Date().toISOString().split("T")[0],
-    });
+    const slug = slugify(title, { lower: true, strict: true });
+    const date = new Date().toISOString();
 
-    alert("文章保存成功（模拟）");
+    const { data, error } = await supabase.from("posts").insert([
+      {
+        slug,
+        title,
+        content,
+        created_at: date,
+      },
+    ]);
+
+    if (error) {
+      alert("保存失败：" + error.message);
+      return;
+    }
+
+    alert("保存成功！");
     router.push(`/blog/${slug}`);
   };
+
   return (
     <main className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">📝 写文章</h1>
