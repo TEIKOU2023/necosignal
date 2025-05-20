@@ -1,9 +1,9 @@
 "use client";
 
-import slugify from "slugify";
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { generateUniqueSlug } from "@/lib/slug";
 
 export default function WritePage() {
   const router = useRouter();
@@ -13,10 +13,10 @@ export default function WritePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const slug = slugify(title, { lower: true, strict: true });
+    const slug = generateUniqueSlug();
     const date = new Date().toISOString();
 
-    const { data, error } = await supabase.from("posts").insert([
+    const { data: _data, error } = await supabase.from("posts").insert([
       {
         slug,
         title,
