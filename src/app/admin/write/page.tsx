@@ -16,21 +16,25 @@ export default function WritePage() {
     const slug = generateUniqueSlug();
     const date = new Date().toISOString();
 
-    const { data: _data, error } = await supabase.from("posts").insert([
-      {
-        slug,
-        title,
-        content,
-        created_at: date,
-      },
-    ]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { error } = await supabase
+      .from("posts")
+      .insert([
+        {
+          slug,
+          title,
+          content,
+          created_at: date,
+        },
+      ])
+      .select();
 
     if (error) {
       alert("保存失败：" + error.message);
       return;
     }
 
-    alert("保存成功！");
+    alert("保存成功！正在跳转到文章页面...");
     router.push(`/blog/${slug}`);
   };
 
