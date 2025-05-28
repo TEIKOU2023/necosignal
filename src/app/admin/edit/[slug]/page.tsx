@@ -80,6 +80,13 @@ export default function EditPostPage() {
           />
           作为草稿保存
         </label>
+        <button
+          type="button"
+          onClick={() => router.push(`/blog/${slug}`)}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+        >
+          预览文章
+        </button>
         <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
           保存修改
         </button>
