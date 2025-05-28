@@ -19,6 +19,7 @@ export default function BlogListPage() {
       const { data, error } = await supabase
         .from("posts")
         .select("*")
+        .eq("is_draft", false)
         .order("created_at", { ascending: false });
 
       if (error) {

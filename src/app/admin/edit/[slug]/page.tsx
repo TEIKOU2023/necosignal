@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function EditPage() {
+export default function EditPostPage() {
   const { slug } = useParams();
   const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [isDraft, setIsDraft] = useState(false);
 
-  // 获取当前文章内容
   useEffect(() => {
     const fetchPost = async () => {
       const { data, error } = await supabase
@@ -20,21 +20,19 @@ export default function EditPage() {
         .eq("slug", slug)
         .single();
 
-      if (error || !data) {
-        alert("无法加载文章");
-        router.push("/admin/posts");
+      if (error) {
+        alert("获取文章失败：" + error.message);
         return;
       }
 
       setTitle(data.title);
       setContent(data.content);
-      setLoading(false);
+      setIsDraft(data.is_draft);
     };
 
     fetchPost();
   }, [slug]);
 
-  // 保存修改
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -43,21 +41,17 @@ export default function EditPage() {
       .update({
         title,
         content,
+        is_draft: isDraft,
       })
       .eq("slug", slug);
 
     if (error) {
-      alert("保存失败：" + error.message);
-      return;
+      alert("更新失败：" + error.message);
+    } else {
+      alert("更新成功！");
+      router.push("/admin/posts");
     }
-
-    alert("保存成功！");
-    router.push("/admin/posts");
   };
-
-  if (loading) {
-    return <p className="p-6">加载中...</p>;
-  }
 
   return (
     <main className="max-w-2xl mx-auto p-6">
@@ -73,11 +67,19 @@ export default function EditPage() {
         />
         <textarea
           className="border px-4 py-2 min-h-[200px]"
-          placeholder="Markdown 内容"
+          placeholder="在这里写 Markdown 内容..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
         />
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isDraft}
+            onChange={(e) => setIsDraft(e.target.checked)}
+          />
+          作为草稿保存
+        </label>
         <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
           保存修改
         </button>

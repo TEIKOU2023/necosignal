@@ -9,6 +9,7 @@ export default function WritePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isDraft, setIsDraft] = useState(true); // 默认保存为草稿
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,26 +17,23 @@ export default function WritePage() {
     const slug = generateUniqueSlug();
     const date = new Date().toISOString();
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { error } = await supabase
-      .from("posts")
-      .insert([
-        {
-          slug,
-          title,
-          content,
-          created_at: date,
-        },
-      ])
-      .select();
+    const { error } = await supabase.from("posts").insert([
+      {
+        slug,
+        title,
+        content,
+        is_draft: isDraft, // 👈 加上这行
+        created_at: date,
+      },
+    ]);
 
     if (error) {
       alert("保存失败：" + error.message);
       return;
     }
 
-    alert("保存成功！正在跳转到文章页面...");
-    router.push(`/blog/${slug}`);
+    alert("保存成功！");
+    router.push("/admin"); // 可跳转到后台文章列表
   };
 
   return (
@@ -57,8 +55,16 @@ export default function WritePage() {
           onChange={(e) => setContent(e.target.value)}
           required
         />
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isDraft}
+            onChange={(e) => setIsDraft(e.target.checked)}
+          />
+          保存为草稿
+        </label>
         <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-          保存（模拟）
+          保存
         </button>
       </form>
     </main>
