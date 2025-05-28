@@ -1,20 +1,6 @@
-"use client"; // 必须加这一行才能使用 useEffect
-
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import RootBody from "./Rootbody";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,29 +9,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  useEffect(() => {
-    // 自动恢复 Supabase 的 session
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        supabase.auth.refreshSession();
-      }
-    });
-
-    // 可选：清除 hash（如 #access_token=xxx）
-    if (typeof window !== "undefined" && window.location.hash) {
-      window.history.replaceState(null, "", window.location.pathname);
-    }
-  }, []);
-
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body>
+        <RootBody>{children}</RootBody>
       </body>
     </html>
   );
