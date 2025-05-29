@@ -1,14 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
-  // ✅ 替换为你自己的白名单邮箱
-  const allowedEmails = ["zhenghengteikou@gmail.com"];
+  const allowedEmails = ["zhenghengteikou@gmail.com"]; // ← 替换成你自己的邮箱
+
+  // 🚀 登录后自动获取 Session 并跳转
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("获取 Session 失败:", error.message);
+        return;
+      }
+
+      if (session) {
+        console.log("✅ 已登录，跳转中...");
+        router.push("/admin");
+      } else {
+        console.log("尚未登录");
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +48,6 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        // ✅ Vercel/Supabase 用的重定向 URL，请在 .env.local 配置
         emailRedirectTo: process.env.NEXT_PUBLIC_REDIRECT_URL,
       },
     });
