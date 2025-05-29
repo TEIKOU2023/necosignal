@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-
 export default function AdminHome() {
   return (
     <main className="max-w-2xl mx-auto p-6">
