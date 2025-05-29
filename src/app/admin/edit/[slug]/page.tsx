@@ -11,9 +11,33 @@ export default function EditPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isDraft, setIsDraft] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
+  // ✅ 登录检查
   useEffect(() => {
-    const fetchPost = async () => {
+    const checkAuthAndFetch = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.error("获取用户失败：", userError.message);
+        alert("用户信息获取失败，请重新登录。");
+        router.push("/login");
+        return;
+      }
+
+      if (!user) {
+        console.warn("未检测到登录用户，跳转到登录页");
+        router.push("/login");
+        return;
+      }
+
+      console.log("✅ 当前登录用户：", user);
+
+      // 拉取文章
       const { data, error } = await supabase
         .from("posts")
         .select("*")
@@ -22,19 +46,22 @@ export default function EditPostPage() {
 
       if (error) {
         alert("获取文章失败：" + error.message);
+        router.push("/admin/posts");
         return;
       }
 
       setTitle(data.title);
       setContent(data.content);
       setIsDraft(data.is_draft);
+      setLoading(false);
     };
 
-    fetchPost();
-  }, [slug]);
+    checkAuthAndFetch();
+  }, [slug, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
 
     const { error } = await supabase
       .from("posts")
@@ -51,7 +78,17 @@ export default function EditPostPage() {
       alert("更新成功！");
       router.push("/admin/posts");
     }
+
+    setSaving(false);
   };
+
+  if (loading) {
+    return (
+      <main className="max-w-2xl mx-auto p-6">
+        <p>加载中...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-2xl mx-auto p-6">
@@ -87,8 +124,14 @@ export default function EditPostPage() {
         >
           预览文章
         </button>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-          保存修改
+        <button
+          type="submit"
+          disabled={saving}
+          className={`${
+            saving ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+          } text-white px-4 py-2 rounded`}
+        >
+          {saving ? "保存中..." : "保存修改"}
         </button>
       </form>
     </main>
